@@ -1,0 +1,130 @@
+{% extends 'CogitowebDatabaseBackupBundle::list.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	
+	<style type="text/css">
+		.dl-horizontal dt {
+			width:       11em;
+			white-space: normal;
+		}
+		
+		.dl-horizontal dd {
+			margin-left: 12em;
+		}
+	</style>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	
+	<script type="text/javascript">
+		$(function () {
+			$('#confirm-delete').on('show.bs.modal', function (event) {
+				var button        = $(event.relatedTarget);
+				var modal         = $(this);
+				var pathname      = button.data('pathname');
+				var mtime         = button.data('mtime');
+				var route         = Routing.generate('cogitoweb_database_backup_delete', {pathname: pathname});
+				
+				modal.find('.modal-body dd.pathname').text(pathname);
+				modal.find('.modal-body dd.mtime').text(mtime);
+				modal.find('.modal-footer a[name=btn_continue]').attr('href', route);
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block contents %}
+	<div class="container-fluid">
+		
+		{% block flash %}
+			<div class="row">
+				<div class="col-md-12">
+					{% for flashMessage in app.session.flashbag.get('info') %}
+						<div class="alert alert-info">
+							<i class="glyphicon glyphicon-info-sign"></i> {{ flashMessage }}
+						</div>
+					{% endfor %}
+
+					{% for flashMessage in app.session.flashbag.get('success') %}
+						<div class="alert alert-success">
+							<i class="glyphicon glyphicon-saved"></i> {{ flashMessage }}
+						</div>
+					{% endfor %}
+
+					{% for flashMessage in app.session.flashbag.get('danger') %}
+						<div class="alert alert-danger">
+							<i class="glyphicon glyphicon-exclamation-sign"></i> {{ flashMessage }}
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		{% endblock%}
+		
+		{% block list %}
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3>{{ 'list.label_dir' | trans({}, 'CogitowebDatabaseBackupBundle') }}: {{ dirname }}</h3>
+						</div>
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th>{{ 'list.label_file'     | trans({}, 'CogitowebDatabaseBackupBundle') }}</th>
+									<th>{{ 'list.label_datetime' | trans({}, 'CogitowebDatabaseBackupBundle') }}</th>
+									<th>{{ 'list.label_actions'  | trans({}, 'CogitowebDatabaseBackupBundle') }}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for file in files %}
+									<tr>
+										<td>{{ file.pathname }}</td>
+										<td>{{ file.mtime }}</td>
+										<td>{% include 'CogitowebDatabaseBackupBundle:Button:delete.html.twig' %}</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		{% endblock %}
+		
+		{% block confirm %}
+			
+			{% block delete %}
+				<div class="modal" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="confirm">
+					<div class="modal-dialog modal-lg" role="document">
+						<div class="modal-content panel-danger">
+							<div class="modal-header panel-heading">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h4 class="modal-title" id="confirm">{{ 'list.confirm.title' | trans({}, 'CogitowebDatabaseBackupBundle') }}</h4>
+							</div>
+							<div class="modal-body">
+								<dl class="dl-horizontal">
+									<dt>{{ 'list.confirm.label_file' | trans({}, 'CogitowebDatabaseBackupBundle') | raw }}</dt>
+									<dd class="pathname"></dd>
+									<dt>{{ 'list.confirm.label_file_created_at' | trans({}, 'CogitowebDatabaseBackupBundle') | raw }}</dt>
+									<dd class="mtime"></dd>
+								</dl>
+								<p>{{ 'list.confirm.delete_message' | trans({}, 'CogitowebDatabaseBackupBundle') }}</p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn" data-dismiss="modal">
+									<i class="glyphicon glyphicon-remove"></i> {{ 'list.confirm.btn_abort' | trans({}, 'CogitowebDatabaseBackupBundle') }}
+								</button>
+								<a name="btn_continue" class="btn btn-danger">
+									<i class="glyphicon glyphicon-ok"></i> {{ 'list.confirm.btn_continue' | trans({}, 'CogitowebDatabaseBackupBundle') }}
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endblock %}
+			
+		{% endblock %}
+		
+	</div>
+{% endblock %}

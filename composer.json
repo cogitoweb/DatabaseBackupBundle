@@ -1,0 +1,33 @@
+{
+	"name": "cogitoweb/database-backup-bundle",
+	"description": "Manage backup of the underlying database",
+	"type": "symfony-bundle",
+	"authors": [
+		{
+			"name":  "Daniele Artico",
+			"email": "daniele.artico@cogitoweb.it"
+		}
+	],
+	"keywords": [
+		"database",
+		"database bundle",
+		"database manager",
+		"database backup",
+		"database backup bundle",
+		"database backup manager"
+	],
+	"autoload": {
+		"psr-0": {
+			"Cogitoweb\\DatabaseBackupBundle": ""
+		}
+	},
+	"require": {
+        "friendsofsymfony/jsrouting-bundle": "^1.5"
+		"gedmo/doctrine-extensions":         "~2.3",
+		"symfony/filesystem":                "^2.7",
+        "symfony/finder":                    "^2.7",
+		"symfony/http-foundation":           "dev-master",
+		"symfony/symfony":                   "~2.3"
+	},
+	"target-dir" : "Cogitoweb/DatabaseBackupBundle"
+}

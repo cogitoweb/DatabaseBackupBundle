@@ -1,0 +1,12 @@
+cogitoweb_database_backup_exec:
+    path:     /database-backup/exec
+    defaults: { _controller: CogitowebDatabaseBackupBundle:DatabaseBackup:exec }
+
+cogitoweb_database_backup_list:
+    path:     /database-backup/list
+    defaults: { _controller: CogitowebDatabaseBackupBundle:DatabaseBackup:list }
+
+cogitoweb_database_backup_delete:
+    path:     /database-backup/delete/{pathname}
+    defaults: { _controller: CogitowebDatabaseBackupBundle:DatabaseBackup:delete }
+    options:  { expose: true }

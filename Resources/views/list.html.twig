@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>CogitowebDatabaseBackupBundle</title>
+		{% block stylesheets %}
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		{% endblock %}
+		{% block javascripts %}
+			<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+			<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+			<script src="{{ path('fos_js_routing_js', {'callback': 'fos.Router.setData'}) }}"></script>
+		{% endblock %}
+	</head>
+	<body>
+		{% block contents %}{% endblock %}
+	</body>
+</html>

@@ -1,0 +1,8 @@
+parameters:
+#    database_backup_dir: C:\Users\Daniele\Desktop
+    database_backup_dir: C:\Users\Daniele\Desktop\Backup
+
+services:
+#    cogitoweb_database_backup.example:
+#        class: Cogitoweb\DatabaseBackupBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
