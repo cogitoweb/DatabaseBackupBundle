@@ -2,18 +2,19 @@
 ---
 
 exec:
-    btn_exec:               Backup
+    exec_button:            Backup
     flash_success:          Backup del database eseguito correttamente
     flash_info_no_password: Connessione effettuata con argomento --no-password
     flash_error:            Backup del database non eseguito
 
 list:
+    list_button:    Visualizza
     label_dir:      Cartella
     label_file:     File
     label_datetime: Data e ora creazione
     label_actions:  Azioni
-    btn_restore:    Ripristina
-    btn_delete:     Elimina
+    restore_button: Ripristina
+    delete_button:  Elimina
     
     confirm:
         title:                 Conferma operazione
