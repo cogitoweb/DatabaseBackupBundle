@@ -22,10 +22,10 @@
 		}
 	},
 	"require": {
-        "friendsofsymfony/jsrouting-bundle": "^1.5"
+		"friendsofsymfony/jsrouting-bundle": "^1.5",
 		"gedmo/doctrine-extensions":         "~2.3",
 		"symfony/filesystem":                "^2.7",
-        "symfony/finder":                    "^2.7",
+		"symfony/finder":                    "^2.7",
 		"symfony/http-foundation":           "dev-master",
 		"symfony/symfony":                   "~2.3"
 	},
