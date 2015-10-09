@@ -129,21 +129,19 @@ class DatabaseBackupController extends Controller
 			// ... in DATABASE_BACKUP_DIR...
 			->in($dirname)
 			// Do not list subfolders
-			->depth(0)
-			// Avoid exceptions
-			->ignoreUnreadableDirs()
+			->depth('0')
 			// Ordered by mtime
 			->sortByModifiedTime()
 			// Show newer first
-			->sort(function ($a, $b) {
-				return strcmp($b->getRealpath(), $a->getRealpath());
+			->sort(function (SplFileInfo $a, SplFileInfo $b) {
+				return strcmp($b->getMTime(), $a->getMTime());
 			})
 		;
 		
 		$files  = [];
 		
 		foreach ($finder as $file) { /* @var $file SplFileInfo */
-			$mtime    = \DateTime::createFromFormat('U', $file->getMTime()); /* @var $mtime \DateTime */
+			$mtime = \DateTime::createFromFormat('U', $file->getMTime()); /* @var $mtime \DateTime */
 			
 			// Convert from utc to local
 			$timezone = new \DateTimeZone(date_default_timezone_get());
@@ -256,6 +254,11 @@ class DatabaseBackupController extends Controller
 		
 		switch ($driver) {
 			case 'pdo_pgsql':
+				$host     = $host     ?: 'localhost';
+				$port     = $port     ?: 5432;
+				$username = $username ?: 'postgres';
+				$databse  = $database ?: 'postgres';
+				
 				$this->addFlash('info', $this->get('translator')->trans('exec.flash_info_no_password', [], 'CogitowebDatabaseBackupBundle'));
 					
 				return sprintf(self::POSTGRES_SCHEMA_PATTERN, $host, $port, $username, $filename, $database);
@@ -281,6 +284,11 @@ class DatabaseBackupController extends Controller
 		
 		switch ($driver) {
 			case 'pdo_pgsql':
+				$host     = $host     ?: 'localhost';
+				$port     = $port     ?: 5432;
+				$username = $username ?: 'postgres';
+				$databse  = $database ?: 'postgres';
+				
 				$this->addFlash('info', $this->get('translator')->trans('exec.flash_info_no_password', [], 'CogitowebDatabaseBackupBundle'));
 				
 				return sprintf(self::POSTGRES_BACKUP_PATTERN, $host, $port, $username, $filename, $database);
