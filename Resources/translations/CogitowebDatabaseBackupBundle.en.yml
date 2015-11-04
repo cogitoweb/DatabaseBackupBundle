@@ -1,0 +1,29 @@
+## YAML Template.
+---
+
+exec:
+    exec_button:            Backup
+    flash_success:          Backup completed successfully
+    flash_info_no_password: Connection performed with --no-password argument
+    flash_error:            Backup not completed
+
+list:
+    list_button:    View
+    label_dir:      Folder
+    label_file:     File
+    label_datetime: Creation date and time
+    label_actions:  Actions
+    restore_button: Restore
+    delete_button:  Delete
+    
+    confirm:
+        title:                 Confirm operation
+        label_file:            File
+        label_file_created_at: Creation date and time
+        delete_message:        Warning! The operation will delete backup file, continue?
+        btn_abort:             Cancel
+        btn_continue:          Continue
+
+delete:
+    flash_success:          Backup deleted successfully
+    flash_error:            Backup deletion not completed
