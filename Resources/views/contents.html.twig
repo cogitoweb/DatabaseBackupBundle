@@ -4,6 +4,10 @@
 	{{ parent() }}
 	
 	<style type="text/css">
+		body {
+			margin-top: 1em;
+		}
+		
 		.dl-horizontal dt {
 			width:       11em;
 			white-space: normal;
@@ -43,18 +47,21 @@
 				<div class="col-md-12">
 					{% for flashMessage in app.session.flashbag.get('info') %}
 						<div class="alert alert-info">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
 							<i class="glyphicon glyphicon-info-sign"></i> {{ flashMessage }}
 						</div>
 					{% endfor %}
 
 					{% for flashMessage in app.session.flashbag.get('success') %}
 						<div class="alert alert-success">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
 							<i class="glyphicon glyphicon-saved"></i> {{ flashMessage }}
 						</div>
 					{% endfor %}
 
 					{% for flashMessage in app.session.flashbag.get('danger') %}
 						<div class="alert alert-danger">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
 							<i class="glyphicon glyphicon-exclamation-sign"></i> {{ flashMessage }}
 						</div>
 					{% endfor %}
