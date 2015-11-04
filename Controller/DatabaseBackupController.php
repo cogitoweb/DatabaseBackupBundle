@@ -8,12 +8,11 @@
 
 namespace Cogitoweb\DatabaseBackupBundle\Controller;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,14 +24,14 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DatabaseBackupController extends Controller
 {
-	const FILENAME_PATTERN          = '%s_%s_%s.backup';
-	const FILENAME_DATETIME_FORMAT  = 'YmdHis';
+	const FILENAME_PATTERN                = '%s_%s_%s.backup';
+	const FILENAME_DATETIME_FORMAT        = 'YmdHis';
 	
-	const POSTGRES_SCHEMA_PATTERN   = 'pg_dump --host %s --port %d --username %s --no-password --schema-only --file %s %s';
-	const POSTGRES_BACKUP_PATTERN   = 'pg_dump --host %s --port %d --username %s --no-password --format custom --blobs --file %s %s';
+	const POSTGRES_SCHEMA_PATTERN         = 'pg_dump --host %s --port %d --username %s --no-password --schema-only --file %s %s';
+	const POSTGRES_BACKUP_PATTERN         = 'pg_dump --host %s --port %d --username %s --no-password --format custom --blobs --file %s %s';
 	
-	const CONFIG_FILE               = 'Cogitoweb\DatabaseBackupBundle\Resources\config\services.yml';
-	const DATABASE_BACKUP_DIR_PARAM = 'database_backup_dir';
+	const CONFIG_FILE                     = 'Cogitoweb\DatabaseBackupBundle\Resources\config\services.yml';
+	const DATABASE_BACKUP_DIRECTORY_PARAM = 'database_backup_directory';
 	
 	/**
 	 * Execute database backup
@@ -42,12 +41,14 @@ class DatabaseBackupController extends Controller
 	 */
 	public function execAction(Request $request)
     {
+		$connection = $this->container->get('doctrine.dbal.default_connection'); /*@var $connection Connection */
+		
 		// Setup database params
-		$host      = $this->container->getParameter('database_host');
-		$port      = $this->container->getParameter('database_port');
-		$username  = $this->container->getParameter('database_user');
-		$password  = $this->container->getParameter('database_password');
-		$database  = $this->container->getParameter('database_name');
+		$host      = $connection->getHost();
+		$port      = $connection->getPort();
+		$username  = $connection->getUsername();
+		$password  = $connection->getPassword();
+		$database  = $connection->getDatabase();
 		
 		try {
 			/*
@@ -57,8 +58,8 @@ class DatabaseBackupController extends Controller
 			 * The restore function will work only if the underlying database schema has not changed.
 			 */
 
-			// Check if system temp folder exists and PHP has write permission
-			$this->tempFolderExists();
+			// Check if system temp dir exists and PHP has write permission
+			$this->tempDirectoryExists();
 			$this->canWrite(sys_get_temp_dir());
 			
 			// Setup temp filename
@@ -85,7 +86,7 @@ class DatabaseBackupController extends Controller
 			$this->databaseBackupDirectoryExists();
 			
 			// Get destination dir and check if PHP has write permission
-			$dirname = $this->getDatabaseBackupFolder();
+			$dirname = $this->getDatabaseBackupDirectory();
 			$this->canWrite($dirname);
 
 			// Setup backup filename
@@ -114,23 +115,32 @@ class DatabaseBackupController extends Controller
 	 */
 	public function listAction(Request $request)
 	{
-		// Check if destination dir exists
-		$this->databaseBackupDirectoryExists();
-		
-		// Get destination dir and check if PHP has read permission
-		$dirname = $this->getDatabaseBackupFolder();
-		$this->canRead($dirname);
+		try {
+			// Get destination dir 
+			$dirname = $this->getDatabaseBackupDirectory();
+			
+			// Check if destination dir exists and PHP has read permission
+			$this->databaseBackupDirectoryExists();
+			$this->canRead($dirname);
+		} catch (\Exception $e) {
+			$this->addFlash('danger', $e->getMessage());
+			
+			return $this->render('CogitowebDatabaseBackupBundle::contents.html.twig', [
+				'dirname' => $dirname,
+				'files'   => []
+			]);
+		}
 		
 		// Setup finder
 		$finder = new Finder();
 		$finder
 			// List all files...
 			->files()
-			// ... in DATABASE_BACKUP_DIR...
+			// ... in DATABASE_BACKUP_DIRECTORY
 			->in($dirname)
-			// Do not list subfolders
-			->depth('0')
-			// Ordered by mtime
+			// Do not list subdirs
+			->depth(0)
+			// Order by mtime
 			->sortByModifiedTime()
 			// Show newer first
 			->sort(function (SplFileInfo $a, SplFileInfo $b) {
@@ -174,7 +184,7 @@ class DatabaseBackupController extends Controller
 			$this->databaseBackupDirectoryExists();
 			
 			// Get destination dir and check if PHP has write permission
-			$dirname = $this->getDatabaseBackupFolder();
+			$dirname = $this->getDatabaseBackupDirectory();
 			$this->canWrite($dirname);
 			
 			// Get the full path of backup file
@@ -204,9 +214,9 @@ class DatabaseBackupController extends Controller
 	/**
 	 * @return string
 	 */
-	protected function getDatabaseBackupFolder()
+	protected function getDatabaseBackupDirectory()
 	{
-		return realpath($this->container->getParameter(self::DATABASE_BACKUP_DIR_PARAM));
+		return realpath($this->container->getParameter(self::DATABASE_BACKUP_DIRECTORY_PARAM));
 	}
 	
 	/**
@@ -324,13 +334,13 @@ class DatabaseBackupController extends Controller
 	 */
 	protected function databaseBackupDirectoryExists()
 	{
-		$dirname = $this->getDatabaseBackupFolder();
+		$dirname = $this->getDatabaseBackupDirectory();
 		
 		if (!file_exists($dirname)) {
 			throw new \InvalidArgumentException(sprintf(
 				'the database backup directory "%s" does not exist. Check parameter "%s" in config file "%s"',
 				$path,
-				self::DATABASE_BACKUP_DIR_PARAM,
+				self::DATABASE_BACKUP_DIRECTORY_PARAM,
 				self::CONFIG_FILE
 			));
 		}
@@ -341,7 +351,7 @@ class DatabaseBackupController extends Controller
 	 * 
 	 * @throws \InvalidArgumentException
 	 */
-	protected function tempFolderExists()
+	protected function tempDirectoryExists()
 	{
 		$dirname = sys_get_temp_dir();
 		
