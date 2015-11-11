@@ -30,7 +30,7 @@ class DatabaseBackupController extends Controller
 	const POSTGRES_SCHEMA_PATTERN         = 'pg_dump --host %s --port %d --username %s --no-password --schema-only --file %s %s';
 	const POSTGRES_BACKUP_PATTERN         = 'pg_dump --host %s --port %d --username %s --no-password --format custom --blobs --file %s %s';
 	
-	const CONFIG_FILE                     = 'Cogitoweb\DatabaseBackupBundle\Resources\config\services.yml';
+	const CONFIG_FILE                     = 'app/config/parameters.yml';
 	const DATABASE_BACKUP_DIRECTORY_PARAM = 'database_backup_directory';
 	
 	/**
@@ -339,7 +339,7 @@ class DatabaseBackupController extends Controller
 		if (!file_exists($dirname)) {
 			throw new \InvalidArgumentException(sprintf(
 				'the database backup directory "%s" does not exist. Check parameter "%s" in config file "%s"',
-				$path,
+				$dirname,
 				self::DATABASE_BACKUP_DIRECTORY_PARAM,
 				self::CONFIG_FILE
 			));
